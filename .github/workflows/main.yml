@@ -34,7 +34,7 @@ jobs:
         run: aws configure list-profiles
 
       - name: List S3 buckets
-        run: aws s3 ls --region eu-central-1 --profile 153386709997_Student
+        run: aws s3 ls --region eu-central-1 --profile techstarter
 
       - name: Install npm dependencies
         run: npm install
