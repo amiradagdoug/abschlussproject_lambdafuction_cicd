@@ -41,6 +41,6 @@ jobs:
 
       - name: Deploy Lambda Function
         run: |
-          npx ncc build index.ts
+    
           zip -j deploy.zip ./dist/*
           aws lambda update-function-code --function-name=login-google --zip-file=fileb://deploy.zip
