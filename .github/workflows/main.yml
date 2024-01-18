@@ -3,30 +3,43 @@ name: Deploy
 on:
   push:
     branches:
-    - master
+      - master
 
 jobs:
   deploy_lambda:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
           node-version: '12'
+
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets. AWS_SESSION_TOKEN }}
-       
-          aws-region: eu-central-1
-      - name: npm install
-        env:
-          CI: true
         run: |
-          npm ci
-      - name: deploy
+          mkdir -p ~/.aws/
+          echo "$super_secret" > ~/.aws/credentials
+        env:
+          super_secret: ${{ secrets.AWS_CONFIG }}
+
+      - name: Verify AWS Credentials
+        run: cat ~/.aws/credentials
+
+      - name: Install AWS CLI
+        uses: unfor19/install-aws-cli-action@v1
+
+      - name: List AWS CLI profiles
+        run: aws configure list-profiles
+
+      - name: List S3 buckets
+        run: aws s3 ls --region eu-central-1 --profile 153386709997_Student
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Deploy Lambda Function
         run: |
           npx ncc build index.ts
           zip -j deploy.zip ./dist/*
